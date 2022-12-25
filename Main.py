@@ -59,9 +59,11 @@ def main():
     cap = cv2.VideoCapture(video_path)
     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    i = 0
-    ret, frame1 = cap.read()
-    ret, frame2 = cap.read()
+    
+    _, frame1 = cap.read()
+    _, frame2 = cap.read()
+    frame1 = cv2.resize(frame1, (480, 360))
+    frame2 = cv2.resize(frame2, (480, 360))
 
     while cap.isOpened():
 
@@ -74,7 +76,7 @@ def main():
         # The Gaussian smoothing step is bypassed for saving computation power
         ###################################
 
-        # diff = gaussian_blur(diff, 5)
+        #diff = gaussian_blur(diff, 5)
 
         #########################################
         thresh = threshold(diff, 10)
@@ -83,15 +85,16 @@ def main():
 
         for contour in contours:
             (x, y, w, h) = cv2.boundingRect(contour)
-            if h > 270 and w > 150:
+            if h > (frame_height*0.3) and w > (frame_width*0.02):
                 cv2.rectangle(framek, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-        image = cv2.resize(framek, (1280, 720))
+        #image = cv2.resize(framek, (1280, 720))
 
-        cv2.imshow("feed", image)
+        cv2.imshow("feed", framek)
 
-        frame1 = frame2
+        frame1 = frame2.copy()
         ret, frame2 = cap.read()
+        frame2 = cv2.resize(frame2, (480, 360))
         if cv2.waitKey(40) == 27:
             break
             cv2.destroyAllWindows()
